@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDelegate, CoinManagerDelegate {
+class ViewController: UIViewController {
       
     
     var coinManager = CoinManager()
@@ -25,6 +25,11 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
         currencyPicker.delegate = self
         coinManager.delegate = self
     }
+    
+}
+
+//MARK: - UIPickerViewDataSource
+extension ViewController: UIPickerViewDataSource {
     
     // This specifies the number of columns in the picker
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
@@ -46,6 +51,11 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
         return coinManager.currencyArray[row]
     }
     
+}
+
+//MARK: - UIPickerViewDelegate
+extension ViewController: UIPickerViewDelegate {
+    
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         /*
          This will get called every time when the user scrolls the picker. When that happens it will record
@@ -55,6 +65,10 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
         coinManager.getCoinPrice(currency: selectedCurrency)
     }
     
+}
+
+//MARK: - CoinManagerDelegate
+extension ViewController: CoinManagerDelegate {
     func didGetCoinRate(currency: String, rate: Double) {
         
         DispatchQueue.main.async {
@@ -62,6 +76,4 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
             self.bitcoinLabel.text = String(format: "%.2f", rate)
         }
     }
-    
 }
-
