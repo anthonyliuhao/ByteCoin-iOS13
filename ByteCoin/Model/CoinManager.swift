@@ -35,10 +35,7 @@ struct CoinManager {
     func getCoinPrice(currency: String) {
         
         let urlString = "\(baseURL)/\(currency)?apikey=\(self.apiKey!)"
-        performRequest(with: urlString)
-    }
-    
-    func performRequest(with urlString: String) {
+        
         // Create the URL
         if let url = URL(string: urlString) {
             
@@ -53,10 +50,10 @@ struct CoinManager {
                 
                 if let safeData = data {
                     let bitcoinData = self.parseJSON(btcData: safeData)
-                    print(bitcoinData?.rate ?? 0)
-                    self.delegate?.didGetCoinRate(currency: bitcoinData?.asset_id_quote ?? "??", rate: bitcoinData?.rate ?? 0)
+                    if let bitcoinRate = bitcoinData?.rate {
+                        self.delegate?.didGetCoinRate(currency: currency, rate: bitcoinRate)
+                    }
                 }
-                
             })
             // Start the task
             task.resume()
