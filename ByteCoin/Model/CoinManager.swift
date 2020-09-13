@@ -31,6 +31,43 @@ struct CoinManager {
     }
     
     func getCoinPrice(currency: String) -> String {
+        
+        let urlString = "\(baseURL)/\(currency)?apikey=\(self.apiKey!)"
+        performRequest(with: urlString)
         return currency
+    }
+    
+    func performRequest(with urlString: String) {
+        // Create the URL
+        if let url = URL(string: urlString) {
+            
+            // Initialize a session
+            let session = URLSession(configuration: .default)
+            
+            // Give it a task and specify the call back
+            let task = session.dataTask(with: url, completionHandler: {(data, response, error) in
+                if error != nil {
+                    return
+                }
+                
+                if let safeData = data {
+                    self.parseJSON(btcData: safeData)
+                }
+                
+            })
+            // Start the task
+            task.resume()
+        }
+    }
+    
+    func parseJSON(btcData: Data) {
+        let decoder = JSONDecoder()
+        
+        do {
+            let decodedData = try decoder.decode(BitcoinData.self, from: btcData)
+            print("\(decodedData.rate)")
+        } catch {
+            print(error)
+        }
     }
 }
