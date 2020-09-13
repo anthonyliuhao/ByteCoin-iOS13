@@ -7,11 +7,13 @@
 //
 
 import Foundation
+import UIKit
 
 struct CoinManager {
     
     let baseURL = "https://rest.coinapi.io/v1/exchangerate/BTC"
     var apiKey: String?
+    var delegate: CoinManagerDelegate?
     
     let currencyArray = ["AUD", "BRL","CAD","CNY","EUR","GBP","HKD","IDR","ILS","INR","JPY","MXN","NOK","NZD","PLN","RON","RUB","SEK","SGD","USD","ZAR"]
     
@@ -30,11 +32,10 @@ struct CoinManager {
         print(self.apiKey!)
     }
     
-    func getCoinPrice(currency: String) -> String {
+    func getCoinPrice(currency: String) {
         
         let urlString = "\(baseURL)/\(currency)?apikey=\(self.apiKey!)"
         performRequest(with: urlString)
-        return currency
     }
     
     func performRequest(with urlString: String) {
@@ -51,7 +52,9 @@ struct CoinManager {
                 }
                 
                 if let safeData = data {
-                    self.parseJSON(btcData: safeData)
+                    let bitcoinData = self.parseJSON(btcData: safeData)
+                    print(bitcoinData?.rate ?? 0)
+                    self.delegate?.didGetCoinRate(currency: bitcoinData?.asset_id_quote ?? "??", rate: bitcoinData?.rate ?? 0)
                 }
                 
             })
@@ -60,14 +63,19 @@ struct CoinManager {
         }
     }
     
-    func parseJSON(btcData: Data) {
+    func parseJSON(btcData: Data) -> BitcoinData?{
         let decoder = JSONDecoder()
         
         do {
             let decodedData = try decoder.decode(BitcoinData.self, from: btcData)
-            print("\(decodedData.rate)")
+            return decodedData
         } catch {
             print(error)
+            return nil
         }
     }
+}
+
+protocol CoinManagerDelegate {
+    func didGetCoinRate(currency: String, rate: Double)
 }
