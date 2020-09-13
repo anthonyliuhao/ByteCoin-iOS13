@@ -10,4 +10,5 @@ import Foundation
 
 struct BitcoinData: Decodable {
     var rate: Double
+    var asset_id_quote: String
 }
